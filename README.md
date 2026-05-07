@@ -1,8 +1,5 @@
 
-
 #  LLM Fine‑tuning – Blockchain Transaction Parser
-
-Fine tuning FLAN‑T5‑small with LoRA to extract structured JSON data from raw blockchain transaction logs.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Black-html/llm-finetuning-whale-tracker/blob/main/Whale_tracker.ipynb)
 
@@ -40,8 +37,7 @@ The notebook generates a toy dataset of 30 Ethereum‑like transaction statement
 - **Base model:** `google/flan-t5-small` (80M params)  
 - **PEFT method:** LoRA (r=8, alpha=32, dropout=0.1)  
 - **Trainable params:** 344,064 (0.445% of all weights)  
-
-Loss after 10 epochs: ~11.0 (expected due to tiny dataset). The pipeline is what matters – you can increase data size for real accuracy.
+- **Loss after 10 epochs:** ~11.0 (expected due to tiny dataset). The pipeline is what matters – you can increase data size for real accuracy.
 
 ---
 
@@ -52,71 +48,70 @@ Training takes ~3–4 minutes.
 
 ```bash
 # Install dependencies (inside Colab)
-!pip install peft==0.10.0 transformers datasets accelerate torch``` 
+!pip install peft==0.10.0 transformers datasets accelerate torch
+```
 
+All steps are self‑contained: data generation → tokenization → LoRA → training → inference.
 
-## Example Inference
-Input:
+---
 
+##  Example Inference
 
-text
+**Input:**
+```
 0xabc sent 12345 BTW to 0xdef on May 6 2026
-Output (trained on 30 examples):
+```
 
-text
+**Output (trained on 30 examples):**
+```
 0xabc ne 12345
+```
+
 (The model did not converge; this is expected with such a small dataset. Increase to 500+ examples for usable output.)
 
-## How to Use
-Open the notebook in Colab / Jupyter / VS Code.
+---
 
-Run all cells – no extra setup required.
+##  How to Use
 
-Modify the dataset – change tokens, dates, or add real transaction logs.
+1. **Open the notebook** in Colab / Jupyter / VS Code.  
+2. **Run all cells** – no extra setup required.  
+3. **Modify the dataset** – change `tokens`, `dates`, or add real transaction logs.  
+4. **Increase `num_train_epochs`** or use a larger base model (`flan-t5-base`) for better results.  
+5. **Save your fine‑tuned model** with `peft_model.save_pretrained("./my_whale_tracker")`.
 
-Increase num_train_epochs or use a larger base model (flan-t5-base) for better results.
+---
 
-Save your fine‑tuned model with peft_model.save_pretrained("./my_whale_tracker").
+##  Repository Structure
 
-## Repository Structure
-text
+```
 .
 ├── Whale_tracker.ipynb         # Full training + inference notebook
 ├── README.md                   # This file
 └── requirements.txt            # Python dependencies
-⚙️ Requirements
-Python 3.10+
+```
 
-PyTorch, Transformers, Datasets, PEFT, Accelerate
+---
+
+##  Requirements
+
+- Python 3.10+  
+- PyTorch, Transformers, Datasets, PEFT, Accelerate  
 
 Install with:
 
-bash
+```bash
 pip install -r requirements.txt
+```
 
- ## Limitations (Honest & Important)
-Issue	Impact
-Only 30 training examples	Model didn't learn the JSON format
-FLAN‑T5‑small is weak for structured generation	Use flan-t5-large or lora with bigger base
-Loss plateaued at ~11	More data + more epochs needed
-This is a demonstration of the workflow, not a production model.
-With 500+ examples and a larger LLM, you would get clean JSON extraction.
+---
 
-🔮 Future Improvements
-Use real on‑chain data from Etherscan/Dune (pandas → dataset)
+##  Limitations (Honest & Important)
 
-Expand to multi‑task: classify tx type (swap/transfer/mint)
+| Issue | Impact |
+|-------|--------|
+| Only 30 training examples | Model didn't learn the JSON format |
+| FLAN‑T5‑small is weak for structured generation | Use `flan-t5-large` or `lora` with bigger base |
+| Loss plateaued at ~11 | More data + more epochs needed |
 
-Compare LoRA vs QLoRA vs full fine‑tuning
-
-Deploy as a simple API (FastAPI + Hugging Face TGI)
-
-## License
-MIT – feel free to use and adapt for your own whale‑tracking tools.
-
-## Acknowledgements
-Hugging Face for Transformers & PEFT
-
-Google for FLAN‑T5
-
-The open‑source community for excellent LLM tutorials
+**This is a demonstration of the *workflow*, not a production model.**  
+With 500+ examples and a larger LLM
